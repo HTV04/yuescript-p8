@@ -3564,27 +3564,6 @@ private:
 		return std::nullopt;
 	}
 
-	int getLuaTarget(ast_node* x) {
-		if (auto target = getOption("target")) {
-			if (target.value() == "5.1"sv) {
-				return 501;
-			} else if (target.value() == "5.2"sv) {
-				return 502;
-			} else if (target.value() == "5.3"sv) {
-				return 503;
-			} else if (target.value() == "5.4"sv) {
-				return 504;
-			} else {
-				throw std::logic_error(_info.errorMessage("get invalid Lua target \""s + target.value() + "\", should be 5.1, 5.2, 5.3 or 5.4"s, x));
-			}
-		}
-#ifndef YUE_NO_MACRO
-		return LUA_VERSION_NUM;
-#else
-		return 504;
-#endif // YUE_NO_MACRO
-	}
-
 #ifndef YUE_NO_MACRO
 	void passOptions() {
 		if (!_config.options.empty()) {
@@ -5093,7 +5072,7 @@ private:
 		str_list temp;
 		for (auto _op : unary_value->ops.objects()) {
 			std::string op = _parser.toString(_op);
-			if (op == "~"sv && getLuaTarget(_op) < 503) {
+			if (op == "~"sv) {
 				throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, _op));
 			}
 			temp.push_back(op == "not"sv ? op + ' ' : op);
@@ -5110,7 +5089,7 @@ private:
 		std::string unary_op;
 		for (auto _op : unary_exp->ops.objects()) {
 			std::string op = _parser.toString(_op);
-			if (op == "~"sv && getLuaTarget(_op) < 503) {
+			if (op == "~"sv) {
 				throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, _op));
 			}
 			unary_op.append(op == "not"sv ? op + ' ' : op);
@@ -5917,63 +5896,22 @@ private:
 		str_list temp;
 		bool extraDo = false;
 		bool withContinue = hasContinueStatement(body);
-		int target = getLuaTarget(body);
 		std::string extraLabel;
 		if (withContinue) {
-			if (target < 502) {
-				if (auto block = ast_cast<Block_t>(body)) {
-					if (!block->statements.empty()) {
-						auto stmt = static_cast<Statement_t*>(block->statements.back());
-						if (auto breakLoop = ast_cast<BreakLoop_t>(stmt->content)) {
-							extraDo = _parser.toString(breakLoop) == "break"sv;
-						}
-					}
-				}
-				auto continueVar = getUnusedName("_continue_"sv);
-				addToScope(continueVar);
-				_continueVars.push({continueVar, nullptr});
-				_buf << indent() << "local "sv << continueVar << " = false"sv << nll(body);
-				_buf << indent() << "repeat"sv << nll(body);
-				pushScope();
-				if (extraDo) {
-					_buf << indent() << "do"sv << nll(body);
-					pushScope();
-				}
-				temp.push_back(clearBuf());
-			} else {
-				auto continueLabel = getUnusedLabel("_continue_"sv);
-				_continueVars.push({continueLabel, nullptr});
-				transformLabel(toAst<Label_t>("::"s + _continueVars.top().var + "::"s, body), temp);
-				extraLabel = temp.back();
-				temp.pop_back();
-			}
+			auto continueLabel = getUnusedLabel("_continue_"sv);
+			_continueVars.push({continueLabel, nullptr});
+			transformLabel(toAst<Label_t>("::"s + _continueVars.top().var + "::"s, body), temp);
+			extraLabel = temp.back();
+			temp.pop_back();
 			addDoToLastLineReturn(body);
 		}
 		transform_plain_body(body, temp, usage, assignList);
 		if (withContinue) {
-			if (target < 502) {
-				if (extraDo) {
-					popScope();
-					_buf << indent() << "end"sv << nll(body);
-				}
-				if (!appendContent.empty()) {
-					_buf << indent() << appendContent;
-				}
-				_buf << indent() << _continueVars.top().var << " = true"sv << nll(body);
-				popScope();
-				_buf << indent() << "until true"sv << nlr(body);
-				_buf << indent() << "if not "sv << _continueVars.top().var << " then"sv << nlr(body);
-				_buf << indent(1) << "break"sv << nlr(body);
-				_buf << indent() << "end"sv << nlr(body);
-				temp.push_back(clearBuf());
-				_continueVars.pop();
-			} else {
-				if (!appendContent.empty()) {
-					temp.push_back(indent() + appendContent);
-				}
-				temp.push_back(extraLabel);
-				_continueVars.pop();
+			if (!appendContent.empty()) {
+				temp.push_back(indent() + appendContent);
 			}
+			temp.push_back(extraLabel);
+			_continueVars.pop();
 		} else if (!appendContent.empty()) {
 			temp.back().append(indent() + appendContent);
 		}
@@ -5988,66 +5926,18 @@ private:
 		std::string conditionVar;
 		std::string extraLabel;
 		ast_ptr<false, ExpListAssign_t> condAssign;
-		int target = getLuaTarget(repeatNode);
 		if (withContinue) {
-			if (target < 502) {
-				if (auto block = ast_cast<Block_t>(body)) {
-					if (!block->statements.empty()) {
-						auto stmt = static_cast<Statement_t*>(block->statements.back());
-						if (auto breakLoop = ast_cast<BreakLoop_t>(stmt->content)) {
-							extraDo = _parser.toString(breakLoop) == "break"sv;
-						}
-					}
-				}
-				conditionVar = getUnusedName("_cond_");
-				forceAddToScope(conditionVar);
-				auto continueVar = getUnusedName("_continue_"sv);
-				forceAddToScope(continueVar);
-				{
-					auto assignment = toAst<ExpListAssign_t>(conditionVar + "=nil"s, repeatNode->condition);
-					auto assign = assignment->action.to<Assign_t>();
-					assign->values.clear();
-					assign->values.push_back(repeatNode->condition);
-					_continueVars.push({continueVar, assignment.get()});
-				}
-				_buf << indent() << "local "sv << conditionVar << " = false"sv << nll(body);
-				_buf << indent() << "local "sv << continueVar << " = false"sv << nll(body);
-				_buf << indent() << "repeat"sv << nll(body);
-				pushScope();
-				if (extraDo) {
-					_buf << indent() << "do"sv << nll(body);
-					pushScope();
-				}
-				temp.push_back(clearBuf());
-			} else {
-				auto continueLabel = getUnusedLabel("_continue_"sv);
-				_continueVars.push({continueLabel, nullptr});
-				transformLabel(toAst<Label_t>("::"s + _continueVars.top().var + "::"s, body), temp);
-				extraLabel = temp.back();
-				temp.pop_back();
-			}
+			auto continueLabel = getUnusedLabel("_continue_"sv);
+			_continueVars.push({continueLabel, nullptr});
+			transformLabel(toAst<Label_t>("::"s + _continueVars.top().var + "::"s, body), temp);
+			extraLabel = temp.back();
+			temp.pop_back();
 			addDoToLastLineReturn(body);
 		}
 		transform_plain_body(body, temp, ExpUsage::Common);
 		if (withContinue) {
-			if (target < 502) {
-				transformAssignment(_continueVars.top().condAssign, temp);
-				if (extraDo) {
-					popScope();
-					_buf << indent() << "end"sv << nll(body);
-				}
-				_buf << indent() << _continueVars.top().var << " = true"sv << nll(body);
-				popScope();
-				_buf << indent() << "until true"sv << nlr(body);
-				_buf << indent() << "if not "sv << _continueVars.top().var << " then"sv << nlr(body);
-				_buf << indent(1) << "break"sv << nlr(body);
-				_buf << indent() << "end"sv << nlr(body);
-				temp.push_back(clearBuf());
-				_continueVars.pop();
-			} else {
-				temp.push_back(extraLabel);
-				_continueVars.pop();
-			}
+			temp.push_back(extraLabel);
+			_continueVars.pop();
 		}
 		out.push_back(join(temp));
 		return conditionVar;
@@ -6122,13 +6012,9 @@ private:
 
 	void checkOperatorAvailable(const std::string& op, ast_node* node) {
 		if (op == "&"sv || op == "~"sv || op == "|"sv || op == ">>"sv || op == "<<"sv) {
-			if (getLuaTarget(node) < 503) {
-				throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, node));
-			}
+			throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, node));
 		} else if (op == "//"sv) {
-			if (getLuaTarget(node) < 503) {
-				throw std::logic_error(_info.errorMessage("floor division is not available when not targeting Lua version 5.3 or higher"sv, node));
-			}
+			throw std::logic_error(_info.errorMessage("floor division is not available when not targeting Lua version 5.3 or higher"sv, node));
 		}
 	}
 
@@ -7906,26 +7792,11 @@ private:
 				forceAddToScope(var);
 				vars.push_back(var);
 			}
-			if (getLuaTarget(x) >= 504) {
-				std::string attrib;
-				if (localAttrib->attrib.is<const_attrib_t>()) {
-					attrib = " <const>"s;
-				} else if (localAttrib->attrib.is<close_attrib_t>()) {
-					attrib = " <close>"s;
-				} else {
-					YUEE("AST node mismatch", localAttrib->attrib);
-				}
-				for (auto& var : vars) {
-					markVarConst(var);
-					var.append(attrib);
-				}
-			} else {
-				if (localAttrib->attrib.is<close_attrib_t>()) {
-					throw std::logic_error(_info.errorMessage("close attribute is not available when not targeting Lua version 5.4 or higher"sv, x));
-				}
-				for (auto& var : vars) {
-					markVarConst(var);
-				}
+			if (localAttrib->attrib.is<close_attrib_t>()) {
+				throw std::logic_error(_info.errorMessage("close attribute is not available when not targeting Lua version 5.4 or higher"sv, x));
+			}
+			for (auto& var : vars) {
+				markVarConst(var);
 			}
 			str_list temp;
 			for (auto item : assignA->values.objects()) {
@@ -7954,23 +7825,11 @@ private:
 		if (item.condAssign) {
 			transformAssignment(item.condAssign, temp);
 		}
-		if (getLuaTarget(breakLoop) < 502) {
-			if (!temp.empty()) {
-				_buf << temp.back();
-			}
-			_buf << indent() << item.var << " = true"sv << nll(breakLoop);
-			_buf << indent() << "break"sv << nll(breakLoop);
-			out.push_back(clearBuf());
-		} else {
-			transformGoto(toAst<Goto_t>("goto "s + item.var, breakLoop), temp);
-			out.push_back(join(temp));
-		}
+		transformGoto(toAst<Goto_t>("goto "s + item.var, breakLoop), temp);
+		out.push_back(join(temp));
 	}
 
 	void transformLabel(Label_t* label, str_list& out) {
-		if (getLuaTarget(label) < 502) {
-			throw std::logic_error(_info.errorMessage("label statement is not available when not targeting Lua version 5.2 or higher"sv, label));
-		}
 		auto labelStr = _parser.toString(label->label);
 		int currentScope = _gotoScopes.top();
 		if (static_cast<int>(_labels.size()) <= currentScope) {
@@ -7989,9 +7848,6 @@ private:
 	}
 
 	void transformGoto(Goto_t* gotoNode, str_list& out) {
-		if (getLuaTarget(gotoNode) < 502) {
-			throw std::logic_error(_info.errorMessage("goto statement is not available when not targeting Lua version 5.2 or higher"sv, gotoNode));
-		}
 		auto labelStr = _parser.toString(gotoNode->label);
 		gotos.push_back({gotoNode, labelStr, _gotoScopes.top(), static_cast<int>(_scopes.size())});
 		out.push_back(indent() + "goto "s + labelStr + nll(gotoNode));
