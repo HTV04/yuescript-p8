@@ -1,6 +1,6 @@
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
-BIN_NAME := yue
+BIN_NAME := yue-p8
 # Compiler used
 CXX ?= g++
 # Extension of source files used in the project
@@ -214,7 +214,7 @@ endif
 	@echo -n "Total build time: "
 	@$(END_TIME)
 
-$(BUILD_PATH)/yue.so: $(SRC_PATH)/yuescript/ast.cpp $(SRC_PATH)/yuescript/yue_compiler.cpp $(SRC_PATH)/yuescript/yue_parser.cpp $(SRC_PATH)/yuescript/yuescript.cpp $(SRC_PATH)/yuescript/parser.cpp
+$(BUILD_PATH)/yue-p8.so: $(SRC_PATH)/yuescript/ast.cpp $(SRC_PATH)/yuescript/yue_compiler.cpp $(SRC_PATH)/yuescript/yue_parser.cpp $(SRC_PATH)/yuescript/yuescript.cpp $(SRC_PATH)/yuescript/parser.cpp
 	$(CMD_PREFIX)$(CXX) $(CXXFLAGS) -I $(SRC_PATH) -I $(SRC_PATH)/3rdParty -I $(LUAI) -L $(LUAL) -llua -o $@ -fPIC -shared $?
 
 # Standard, non-optimized release build
@@ -226,10 +226,10 @@ else
 	@echo "Beginning release build"
 endif
 	@$(START_TIME)
-	@$(MAKE) $(BUILD_PATH)/yue.so --no-print-directory
+	@$(MAKE) $(BUILD_PATH)/yue-p8.so --no-print-directory
 	@echo -n "Total build time: "
 	@$(END_TIME)
-	@mv $(BUILD_PATH)/yue.so $(BIN_PATH)/yue.so
+	@mv $(BUILD_PATH)/yue-p8.so $(BIN_PATH)/yue-p8.so
 
 # Create the directories used in the build
 .PHONY: dirs

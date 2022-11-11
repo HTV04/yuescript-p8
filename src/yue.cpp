@@ -103,7 +103,7 @@ static const char luaminifyCodes[] =
 
 int main(int narg, const char** args) {
 	const char* help =
-		"Usage: yue [options|files|directories] ...\n\n"
+		"Usage: yue-p8 [options|files|directories] ...\n\n"
 		"   -h       Print this message\n"
 #ifndef YUE_COMPILER_ONLY
 		"   -e str   Execute a file or raw codes\n"

@@ -19,7 +19,7 @@ static void openlibs(void* state) {
 	lua_State* L = static_cast<lua_State*>(state);
 	luaL_openlibs(L);
 	luaopen_yue(L);
-	luaL_requiref(L, "yue", luaopen_yue, 1);
+	luaL_requiref(L, "yue-p8", luaopen_yue, 1);
 	lua_pop(L, 1);
 }
 
@@ -52,7 +52,7 @@ std::string version() { return std::string(yue::version); }
 void pushYue(lua_State* L, std::string_view name) {
 	lua_getglobal(L, "package"); // package
 	lua_getfield(L, -1, "loaded"); // package loaded
-	lua_getfield(L, -1, "yue"); // package loaded yue
+	lua_getfield(L, -1, "yue-p8"); // package loaded yue
 	lua_pushlstring(L, &name.front(), name.size()); // package loaded yue name
 	lua_gettable(L, -2); // loaded[name], package loaded yue item
 	lua_insert(L, -4); // item package loaded yue

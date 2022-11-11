@@ -1,10 +1,10 @@
-# YueScript
+# YueScript-P8
 
 <img src="doc/docs/.vuepress/public/image/yuescript.svg" width="300" height="300" alt="logo"/>
 
 [![Ubuntu](https://github.com/pigpigyyy/Yuescript/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/pigpigyyy/Yuescript/actions/workflows/ubuntu.yml) [![Windows](https://github.com/pigpigyyy/Yuescript/actions/workflows/windows.yml/badge.svg)](https://github.com/pigpigyyy/Yuescript/actions/workflows/windows.yml) [![macOS](https://github.com/pigpigyyy/Yuescript/actions/workflows/macos.yml/badge.svg)](https://github.com/pigpigyyy/Yuescript/actions/workflows/macos.yml) [![Discord Badge](https://img.shields.io/discord/844031511208001577?color=5865F2&label=Discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/cRJ2VAm2NV)
 
-Yuescript is a Moonscript dialect. It is derived from [Moonscript language](https://github.com/leafo/moonscript) 0.5.0 and continuously adopting new features to be more up to date. 
+Yuescript-P8 is a Yuescript dialect that compiles to PICO-8 Lua. Yuescript is derived from [Moonscript language](https://github.com/leafo/moonscript) 0.5.0 and continuously adopting new features to be more up to date.
 
 Moonscript is a language that compiles to Lua. Since original Moonscript has been used to write web framework [lapis](https://github.com/leafo/lapis) and run a few business web sites like [itch.io](https://itch.io) and [streak.club](https://streak.club) with some large code bases. The original language is getting too hard to adopt new features for those may break the stablility for existing applications.
 
@@ -12,7 +12,7 @@ So Yuescript is a new code base for pushing the language to go forward and being
 
 Yue (月) is the name of moon in Chinese and it's pronounced as [jyɛ].
 
-## 
+##
 
 ## Features
 
@@ -29,36 +29,15 @@ Yue (月) is the name of moon in Chinese and it's pronounced as [jyɛ].
 
 * **Lua Module**
 
-&emsp;&emsp;Build `yue.so` file with
+&emsp;&emsp;Build `yue-p8.so` file with
 
 ```sh
 > make shared LUAI=/usr/local/include/lua LUAL=/usr/local/lib/lua
 ```
 
-&emsp;&emsp;Then get the binary file from path `bin/shared/yue.so`.
-
-&emsp;&emsp;Or you can install [luarocks](https://luarocks.org), a package manager for Lua modules. Then install it as a Lua module with
-
-```sh
-> luarocks install yuescript
-```
+&emsp;&emsp;Then get the binary file from path `bin/shared/yue-p8.so`.
 
 &emsp;&emsp;Then require the Yuescript module in Lua:
-
-```Lua
-require("yue")("main") -- require `main.yue`
-
-local yue = require("yue")
-local codes, err, globals = yue.to_lua([[
-f = ->
-  print "hello world"
-f!
-]],{
-  implicit_return_root = true,
-  reserve_line_number = true,
-  lint_global = true
-})
-```
 
 
 
@@ -82,8 +61,8 @@ f!
 &emsp;&emsp;Use Yuescript tool with:
 
 ```sh
-> yue -h
-Usage: yue [options|files|directories] ...
+> yue-p8 -h
+Usage: yue-p8 [options|files|directories] ...
 
    -h       Print this message
    -e str   Execute a file or raw codes
@@ -106,12 +85,12 @@ Usage: yue [options|files|directories] ...
    Execute without options to enter REPL, type symbol '$'
    in a single line to start/stop multi-line mode
 ```
-&emsp;&emsp;Use cases:  
-&emsp;&emsp;Recursively compile every Yuescript file with extension `.yue` under current path:  `yue .`  
-&emsp;&emsp;Compile and save results to a target path:  `yue -t /target/path/ .`  
-&emsp;&emsp;Compile and reserve debug info:  `yue -l .`  
-&emsp;&emsp;Compile and generate minified codes:  `yue -m .`  
-&emsp;&emsp;Execute raw codes:  `yue -e 'print 123'`  
+&emsp;&emsp;Use cases:
+&emsp;&emsp;Recursively compile every Yuescript file with extension `.yue` under current path:  `yue .`
+&emsp;&emsp;Compile and save results to a target path:  `yue -t /target/path/ .`
+&emsp;&emsp;Compile and reserve debug info:  `yue -l .`
+&emsp;&emsp;Compile and generate minified codes:  `yue -m .`
+&emsp;&emsp;Execute raw codes:  `yue -e 'print 123'`
 &emsp;&emsp;Execute a Yuescript file:  `yue -e main.yue`
 
 

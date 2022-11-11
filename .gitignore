@@ -1,5 +1,5 @@
-yue
-!win-build/yue
+yue-p8
+!win-build/yue-p8
 !src/yuescript/
 build
 build.luarocks

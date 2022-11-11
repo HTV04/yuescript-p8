@@ -2639,7 +2639,7 @@ private:
 					_buf << defs;
 				else
 					_buf << indent() << left;
-				_buf << " = "sv << left << ' ' << op << ' ' << right << nll(assignment);
+				_buf << ' ' << op << "= " << right << nll(assignment);
 				out.push_back(clearBuf());
 				break;
 			}
@@ -6021,7 +6021,7 @@ private:
 	void transformBinaryOperator(BinaryOperator_t* node, str_list& out) {
 		auto op = _parser.toString(node);
 		checkOperatorAvailable(op, node);
-		out.push_back(op == "!="sv ? "~="s : op);
+		out.push_back(op);
 	}
 
 	void transformForEach(ForEach_t* forEach, str_list& out) {
