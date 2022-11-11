@@ -1,3 +1,0 @@
-macro PI = -> math.pi
-
-print($PI)

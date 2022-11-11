@@ -86,16 +86,16 @@ Usage: yue-p8 [options|files|directories] ...
    in a single line to start/stop multi-line mode
 ```
 &emsp;&emsp;Use cases:
-&emsp;&emsp;Recursively compile every Yuescript file with extension `.yue` under current path:  `yue .`
-&emsp;&emsp;Compile and save results to a target path:  `yue -t /target/path/ .`
-&emsp;&emsp;Compile and reserve debug info:  `yue -l .`
-&emsp;&emsp;Compile and generate minified codes:  `yue -m .`
-&emsp;&emsp;Execute raw codes:  `yue -e 'print 123'`
-&emsp;&emsp;Execute a Yuescript file:  `yue -e main.yue`
+&emsp;&emsp;Recursively compile every Yuescript file with extension `.yue` under current path:  `yue-p8 .`
+&emsp;&emsp;Compile and save results to a target path:  `yue-p8 -t /target/path/ .`
+&emsp;&emsp;Compile and reserve debug info:  `yue-p8 -l .`
+&emsp;&emsp;Compile and generate minified codes:  `yue-p8 -m .`
 
 
 
 ## Editor Support
+
+Yuescript-P8 does not currently have any dedicated extensions for editors, but since the API is almost entirely the same as the original Yuescript, you can its extensions.
 
 * [Vim](https://github.com/pigpigyyy/Yuescript-vim)
 * [ZeroBraneStudio](https://github.com/pkulchenko/ZeroBraneStudio/issues/1134) (Syntax highlighting)
