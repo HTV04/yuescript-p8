@@ -1,8 +1,4 @@
-# YueScript-P8
-
-<img src="doc/docs/.vuepress/public/image/yuescript.svg" width="300" height="300" alt="logo"/>
-
-[![Ubuntu](https://github.com/pigpigyyy/Yuescript/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/pigpigyyy/Yuescript/actions/workflows/ubuntu.yml) [![Windows](https://github.com/pigpigyyy/Yuescript/actions/workflows/windows.yml/badge.svg)](https://github.com/pigpigyyy/Yuescript/actions/workflows/windows.yml) [![macOS](https://github.com/pigpigyyy/Yuescript/actions/workflows/macos.yml/badge.svg)](https://github.com/pigpigyyy/Yuescript/actions/workflows/macos.yml) [![Discord Badge](https://img.shields.io/discord/844031511208001577?color=5865F2&label=Discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/cRJ2VAm2NV)
+# Yuescript-P8
 
 Yuescript-P8 is a Yuescript dialect that compiles to PICO-8 Lua. Yuescript is derived from [Moonscript language](https://github.com/leafo/moonscript) 0.5.0 and continuously adopting new features to be more up to date.
 
@@ -12,9 +8,27 @@ So Yuescript is a new code base for pushing the language to go forward and being
 
 Yue (月) is the name of moon in Chinese and it's pronounced as [jyɛ].
 
-##
-
 ## Features
+
+Yuescript-P8's API is largely similar to regular Yuescript, although it features a few key differences.
+
+* The `target` feature has been removed from the compiler, as it is tuned to PICO-8's Lua only.
+* The `^^`, `>>>`, `<<>`, and `>><` operators are now supported.
+  * Their update assignment counterparts are also supported (i.e. `^^=`).
+* `\` is no longer a chain operator, because it is used as an operator for floor division in PICO-8 Lua. Use `::` instead.
+  * `\=` can now be used for update assignment.
+  * The `//` operator is no longer supported, as it is replaced by `\` in PICO-8 Lua.
+* Implicit returns for the root scope are no longer generated, as they are not supported in PICO-8 Lua.
+  * The corresponding compiler option has been removed as well.
+
+Additionally, the following changes have been made to Lua code generation:
+
+* PICO-8 Lua supports update assignment operators, so they are carried over from Yuescript code instead of being expanded.
+* Class generation code has been tweaked for compatibility.
+* String expressions (`#{}`) are now generated with `tostr` instead of `tostring`.
+* The `!=` operator is now carried over instead of being converted to `~=`, as it is supported in PICO-8 Lua.
+
+### Yuescript Features
 
 * No other dependencies needed except modified **parserlib** library from Achilleas Margaritis with some performance enhancement. **lpeg** library is no longer needed.
 * Written in C++17.
