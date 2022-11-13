@@ -67,12 +67,6 @@ static int yuetolua(lua_State* L) {
 			config.lintGlobalVariable = lua_toboolean(L, -1) != 0;
 		}
 		lua_pop(L, 1);
-		lua_pushliteral(L, "implicit_return_root");
-		lua_gettable(L, -2);
-		if (lua_isboolean(L, -1) != 0) {
-			config.implicitReturnRoot = lua_toboolean(L, -1) != 0;
-		}
-		lua_pop(L, 1);
 		lua_pushliteral(L, "reserve_line_number");
 		lua_gettable(L, -2);
 		if (lua_isboolean(L, -1) != 0) {
@@ -101,12 +95,6 @@ static int yuetolua(lua_State* L) {
 		lua_gettable(L, -2);
 		if (lua_isstring(L, -1) != 0) {
 			config.module = lua_tostring(L, -1);
-		}
-		lua_pop(L, 1);
-		lua_pushliteral(L, "target");
-		lua_gettable(L, -2);
-		if (lua_isstring(L, -1) != 0) {
-			config.options["target"] = lua_tostring(L, -1);
 		}
 		lua_pop(L, 1);
 	}

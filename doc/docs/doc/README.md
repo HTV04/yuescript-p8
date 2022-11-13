@@ -145,11 +145,9 @@ f = ->
   print "hello world"
 f!
 ]],{
-  implicit_return_root = true,
   reserve_line_number = true,
   lint_global = true,
-  space_over_tab = false,
-  target = "5.4"
+  space_over_tab = false
 })
 ```
 

@@ -35,10 +35,9 @@ struct YueResult {
 	std::string err;
 };
 
-YueResult tolua(const std::string& codes, bool reserveLineNumber = true, bool implicitReturnRoot = true, bool useSpaceOverTab = true) {
+YueResult tolua(const std::string& codes, bool reserveLineNumber = true, bool useSpaceOverTab = true) {
 	yue::YueConfig config;
 	config.reserveLineNumber = reserveLineNumber;
-	config.implicitReturnRoot = implicitReturnRoot;
 	config.useSpaceOverTab = useSpaceOverTab;
 	auto result = yue::YueCompiler{YUE_ARGS}.compile(codes, config);
 	return {result.codes, result.error};
@@ -63,9 +62,6 @@ void pushOptions(lua_State* L, int lineOffset) {
 	lua_newtable(L);
 	lua_pushliteral(L, "lint_global");
 	lua_pushboolean(L, 0);
-	lua_rawset(L, -3);
-	lua_pushliteral(L, "implicit_return_root");
-	lua_pushboolean(L, 1);
 	lua_rawset(L, -3);
 	lua_pushliteral(L, "reserve_line_number");
 	lua_pushboolean(L, 1);

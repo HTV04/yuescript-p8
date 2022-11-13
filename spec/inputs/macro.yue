@@ -238,7 +238,6 @@ macro chainC = (...)->
 	import "yue" as {:to_lua}
 	callable = nil
 	config = {
-		implicit_return_root: false
 		reserve_line_number: false
 	}
 	for item in *{...}

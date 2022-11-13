@@ -105,7 +105,7 @@
 				if (window.yue) {
 					let res = ['','compiler error, and please help opening an issue for this. Thanks a lot!'];
 					try {
-						res = window.yue.tolua(text, true, !this.displayonly, true);
+						res = window.yue.tolua(text, true, true);
 						if (res[0] !== '') {
 							this.$data.compiled = res[0];
 						} else {

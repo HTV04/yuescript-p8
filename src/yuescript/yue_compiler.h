@@ -26,7 +26,6 @@ using Options = std::unordered_map<std::string, std::string>;
 
 struct YueConfig {
 	bool lintGlobalVariable = false;
-	bool implicitReturnRoot = true;
 	bool reserveLineNumber = true;
 	bool useSpaceOverTab = false;
 	bool exporting = false;

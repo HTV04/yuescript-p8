@@ -338,13 +338,16 @@ YueParser::YueParser() {
 
 	update_op =
 		expr("..") |
-		expr("//") |
 		expr("or") |
 		expr("and") |
-		expr(">>") |
+		expr("^^") |
+		expr(">>>") |
+		expr("<<>") |
+		expr(">><") |
 		expr("<<") |
+		expr(">>") |
 		expr("??") |
-		set("+-*/%&|");
+		set("+-*/\\%|&");
 
 	Update = Space >> update_op >> expr("=") >> Exp;
 
@@ -376,10 +379,13 @@ YueParser::YueParser() {
 		expr("!=") |
 		expr("==") |
 		expr("..") |
+		expr("^^") |
+		expr(">>>") |
+		expr("<<>") |
+		expr(">><") |
 		expr("<<") |
 		expr(">>") |
-		expr("//") |
-		set("+-*/%><|&~");
+		set("+-*/\\%|&<>~");
 	exp_op_value = Space >> BinaryOperator >> *SpaceBreak >> pipe_exp;
 	Exp = Seperator >> pipe_exp >> *exp_op_value >> -(Space >> expr("??") >> Exp);
 
@@ -462,7 +468,7 @@ YueParser::YueParser() {
 	Index = symx('[') >> not_('[') >> Exp >> sym(']');
 	ChainItem = Invoke >> -existential_op | DotChainItem >> -existential_op | Slice | Index >> -existential_op;
 	DotChainItem = symx('.') >> (Name | Metatable | Metamethod);
-	ColonChainItem = (expr('\\') | expr("::")) >> (LuaKeyword | Name | Metamethod);
+	ColonChainItem = expr("::") >> (LuaKeyword | Name | Metamethod);
 	invoke_chain = Invoke >> -existential_op >> -ChainItems;
 	ColonChain = ColonChainItem >> -existential_op >> -invoke_chain;
 

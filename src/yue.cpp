@@ -62,9 +62,6 @@ void pushOptions(lua_State* L, int lineOffset) {
 	lua_pushliteral(L, "lint_global");
 	lua_pushboolean(L, 0);
 	lua_rawset(L, -3);
-	lua_pushliteral(L, "implicit_return_root");
-	lua_pushboolean(L, 1);
-	lua_rawset(L, -3);
 	lua_pushliteral(L, "reserve_line_number");
 	lua_pushboolean(L, 1);
 	lua_rawset(L, -3);
@@ -267,7 +264,6 @@ int main(int narg, const char** args) {
 	bool minify = false;
 #endif // YUE_COMPILER_ONLY
 	yue::YueConfig config;
-	config.implicitReturnRoot = true;
 	config.lintGlobalVariable = false;
 	config.reserveLineNumber = false;
 	config.useSpaceOverTab = false;
@@ -291,7 +287,6 @@ int main(int narg, const char** args) {
 				codes += ch;
 			}
 			yue::YueConfig conf;
-			conf.implicitReturnRoot = true;
 			conf.lintGlobalVariable = false;
 			conf.reserveLineNumber = false;
 			conf.useSpaceOverTab = true;

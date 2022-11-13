@@ -150,7 +150,7 @@ public:
 				_gotoScope = 1;
 				_varArgs.push({true, false});
 				transformBlock(block, out,
-					config.implicitReturnRoot ? ExpUsage::Return : ExpUsage::Common,
+					ExpUsage::Common,
 					nullptr, true);
 				popScope();
 				if (!gotos.empty()) {
@@ -2612,7 +2612,6 @@ private:
 				chain->items.clear();
 				chain->items.dup(tmpChain->items);
 				auto op = _parser.toString(update->op);
-				checkOperatorAvailable(op, update->op);
 				if (op == "??"sv) {
 					auto defs = getPreDefineLine(assignment);
 					temp.push_back(defs);
@@ -3653,9 +3652,6 @@ private:
 		lua_pushliteral(L, "lint_global");
 		lua_pushboolean(L, 0);
 		lua_rawset(L, -3);
-		lua_pushliteral(L, "implicit_return_root");
-		lua_pushboolean(L, 1);
-		lua_rawset(L, -3);
 		lua_pushliteral(L, "reserve_line_number");
 		lua_pushboolean(L, 1);
 		lua_rawset(L, -3);
@@ -4343,7 +4339,7 @@ private:
 				auto meta = colon->name.to<Metamethod_t>();
 				switch (meta->item->getId()) {
 					case id<Name_t>(): {
-						auto newColon = toAst<ColonChainItem_t>("\\__"s + _parser.toString(meta->item), x);
+						auto newColon = toAst<ColonChainItem_t>("::__"s + _parser.toString(meta->item), x);
 						chain->items.push_back(newColon);
 						break;
 					}
@@ -6010,18 +6006,8 @@ private:
 		out.push_back(join(temp));
 	}
 
-	void checkOperatorAvailable(const std::string& op, ast_node* node) {
-		if (op == "&"sv || op == "~"sv || op == "|"sv || op == ">>"sv || op == "<<"sv) {
-			throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, node));
-		} else if (op == "//"sv) {
-			throw std::logic_error(_info.errorMessage("floor division is not available when not targeting Lua version 5.3 or higher"sv, node));
-		}
-	}
-
 	void transformBinaryOperator(BinaryOperator_t* node, str_list& out) {
-		auto op = _parser.toString(node);
-		checkOperatorAvailable(op, node);
-		out.push_back(op);
+		out.push_back(_parser.toString(node));
 	}
 
 	void transformForEach(ForEach_t* forEach, str_list& out) {
@@ -6199,7 +6185,7 @@ private:
 				}
 				case id<Exp_t>(): {
 					transformExp(static_cast<Exp_t*>(content), temp, ExpUsage::Closure);
-					temp.back() = globalVar("tostring"sv, content) + '(' + temp.back() + ')';
+					temp.back() = globalVar("tostr"sv, content) + '(' + temp.back() + ')';
 					break;
 				}
 				default: YUEE("AST node mismatch", content); break;
@@ -6405,14 +6391,14 @@ private:
 			_buf << "for "sv << item << " in *{"sv << mixins << "}\n"sv;
 			_buf << '\t' << cls << ',' << mixin << '=' << item << ".__base?,"sv << item << ".__base or "sv << item << '\n';
 			_buf << "\tfor "sv << key << ',' << val << " in pairs "sv << mixin << '\n';
-			_buf << "\t\t"sv << baseVar << '[' << key << "]="sv << val << " if "sv << baseVar << '[' << key << "]==nil and (not "sv << cls << " or not "sv << key << "\\match \"^__\")"sv;
+			_buf << "\t\t"sv << baseVar << '[' << key << "]="sv << val << " if "sv << baseVar << '[' << key << "]==nil and (not "sv << cls << " or not sub("sv << key << ", 0, 2) == \"__\""sv;
 			transformBlock(toAst<Block_t>(clearBuf(), x), temp, ExpUsage::Common);
 		}
 		if (!parentVar.empty()) {
 			auto key = getUnusedName("_key_"sv);
 			auto val = getUnusedName("_val_"sv);
 			_buf << "for "sv << key << ',' << val << " in pairs "sv << parentVar << ".__base"sv << '\n'
-				 << '\t' << baseVar << '[' << key << "]="sv << val << " if "sv << baseVar << '[' << key << "]==nil and "sv << key << "\\match(\"^__\") and not ("sv << key << "==\"__index\" and "sv << val << "=="sv << parentVar << ".__base)"sv;
+				 << '\t' << baseVar << '[' << key << "]="sv << val << " if "sv << baseVar << '[' << key << "]==nil and sub("sv << key << ", 0, 2) == \"__\" and not ("sv << key << "==\"__index\" and "sv << val << "=="sv << parentVar << ".__base)"sv;
 			transformBlock(toAst<Block_t>(clearBuf(), x), temp, ExpUsage::Common);
 		}
 		transformAssignment(toAst<ExpListAssign_t>(baseVar + ".__index ?\?= "s + baseVar, classDecl), temp);
@@ -7358,7 +7344,6 @@ private:
 					config.lineOffset = 0;
 					config.lintGlobalVariable = false;
 					config.reserveLineNumber = false;
-					config.implicitReturnRoot = _config.implicitReturnRoot;
 					config.module = moduleFullName;
 					config.exporting = true;
 					auto result = compiler.compile(text, config);
