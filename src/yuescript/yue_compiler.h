@@ -29,6 +29,7 @@ struct YueConfig {
 	bool reserveLineNumber = true;
 	bool useSpaceOverTab = false;
 	bool exporting = false;
+	bool profiling = false;
 	int lineOffset = 0;
 	std::string module;
 	Options options;
@@ -47,6 +48,8 @@ struct CompileInfo {
 	std::string error;
 	std::unique_ptr<GlobalVars> globals;
 	std::unique_ptr<Options> options;
+	double parseTime;
+	double compileTime;
 };
 
 class YueCompilerImpl;
