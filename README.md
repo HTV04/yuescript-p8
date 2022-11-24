@@ -18,8 +18,9 @@ Yuescript-P8's API is largely similar to regular Yuescript, although it features
 * `\` is no longer a chain operator, because it is used as an operator for floor division in PICO-8 Lua. Use `::` instead.
   * `\=` can now be used for update assignment.
   * The `//` operator is no longer supported, as it is replaced by `\` in PICO-8 Lua.
-* Implicit returns for the root scope are no longer generated, as they are not supported in PICO-8 Lua.
-  * The corresponding compiler option has been removed as well.
+* Implicit returns are no longer generated to help save tokens after compilation.
+  * Returns must now be explicitly stated, like Lua.
+  * The compiler option for implicit root returns has been removed as well.
 
 Additionally, the following changes have been made to Lua code generation:
 
@@ -110,7 +111,7 @@ Usage: yue-p8 [options|files|directories] ...
 
 ## Editor Support
 
-Yuescript-P8 does not currently have any dedicated extensions for editors, but since the API is almost entirely the same as the original Yuescript, you can its extensions.
+Yuescript-P8 does not currently have any dedicated extensions for editors, but since the API is almost entirely the same as the original Yuescript, you can use its extensions.
 
 * [Vim](https://github.com/pigpigyyy/Yuescript-vim)
 * [ZeroBraneStudio](https://github.com/pkulchenko/ZeroBraneStudio/issues/1134) (Syntax highlighting)

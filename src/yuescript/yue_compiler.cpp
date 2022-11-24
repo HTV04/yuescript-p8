@@ -3226,7 +3226,7 @@ private:
 		if (auto argsDef = funLit->argsDef.get()) {
 			transformFnArgsDef(argsDef, temp);
 			if (funLit->body) {
-				transformBody(funLit->body, temp, ExpUsage::Return);
+				transformBody(funLit->body, temp, ExpUsage::Common);
 			} else {
 				temp.push_back(Empty);
 			}
@@ -3250,7 +3250,7 @@ private:
 			}
 		} else {
 			if (funLit->body) {
-				transformBody(funLit->body, temp, ExpUsage::Return);
+				transformBody(funLit->body, temp, ExpUsage::Common);
 			} else {
 				temp.push_back(Empty);
 			}
