@@ -5104,10 +5104,15 @@ private:
 		str_list temp;
 		for (auto _op : unary_value->ops.objects()) {
 			std::string op = _parser.toString(_op);
-			if (op == "~"sv) {
-				throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, _op));
-			}
-			temp.push_back(op == "not"sv ? op + ' ' : op);
+			if (op == "not"sv)
+				op += ' ';
+			else if (op == "```"sv)
+				op = "$";
+			else if (op == "``"sv)
+				op = "%";
+			else if (op == "`"sv)
+				op = "@";
+			temp.push_back(op);
 		}
 		transformValue(unary_value->value, temp);
 		out.push_back(join(temp));
@@ -5121,10 +5126,15 @@ private:
 		std::string unary_op;
 		for (auto _op : unary_exp->ops.objects()) {
 			std::string op = _parser.toString(_op);
-			if (op == "~"sv) {
-				throw std::logic_error(_info.errorMessage("bitwise operator is not available when not targeting Lua version 5.3 or higher"sv, _op));
-			}
-			unary_op.append(op == "not"sv ? op + ' ' : op);
+			if (op == "not"sv)
+				op += ' ';
+			else if (op == "```"sv)
+				op = "$";
+			else if (op == "``"sv)
+				op = "%";
+			else if (op == "`"sv)
+				op = "@";
+			unary_op.append(op);
 		}
 		str_list temp;
 		for (auto _value : unary_exp->expos.objects()) {
@@ -5413,6 +5423,7 @@ private:
 		}
 	}
 
+	// P8 TODO: Create a compiler optimization using split() in certain cases
 	void transformTable(const node_container& values, str_list& out) {
 		if (values.empty()) {
 			out.push_back("{ }"s);

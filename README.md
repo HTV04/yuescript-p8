@@ -15,6 +15,7 @@ Yuescript-P8's API is largely similar to regular Yuescript, although it features
 * The `target` feature has been removed from the compiler, as it is tuned to PICO-8's Lua only.
 * The `^^`, `>>>`, `<<>`, and `>><` operators are now supported.
   * Their update assignment counterparts are also supported (i.e. `^^=`).
+* New `` ` ``, ``` `` ```, and ```` ``` ```` operators that compile to the memory operators `@`, `%`, and `$` respectively.
 * `\` is no longer a chain operator, because it is used as an operator for floor division in PICO-8 Lua. Use `::` instead.
   * `\=` can now be used for update assignment.
   * The `//` operator is no longer supported, as it is replaced by `\` in PICO-8 Lua.
@@ -22,7 +23,7 @@ Yuescript-P8's API is largely similar to regular Yuescript, although it features
   * Returns must now be explicitly stated, like Lua.
   * The compiler option for implicit root returns has been removed as well.
 
-Additionally, the following changes have been made to Lua code generation:
+Additionally, the following changes have been made to Lua code generation (transparent to the API):
 
 * PICO-8 Lua supports update assignment operators, so they are carried over from Yuescript code instead of being expanded.
 * Class generation code has been tweaked for compatibility.

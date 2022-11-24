@@ -363,7 +363,10 @@ YueParser::YueParser() {
 		expr('-') >> not_(set(">=") | space_one) |
 		expr('#') |
 		expr('~') >> not_(expr('=') | space_one) |
-		expr("not") >> not_(AlphaNum);
+		expr("not") >> not_(AlphaNum) |
+		expr("```") |
+		expr("``") |
+		expr('`');
 	unary_exp = *(Space >> unary_operator) >> expo_exp;
 
 	PipeOperator = expr("|>");
