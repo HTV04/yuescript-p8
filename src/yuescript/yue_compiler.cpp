@@ -1513,11 +1513,6 @@ private:
 				}
 				BREAK_IF(checkValuesLater);
 			}
-			auto chainValue = value->item.as<ChainValue_t>();
-			if (!chainValue || !ast_is<Invoke_t, InvokeArgs_t>(chainValue->items.back())) {
-				_buf << exprs.size() << " right values expected, got "sv << values.size();
-				throw std::logic_error(_info.errorMessage(clearBuf(), values.front()));
-			}
 			auto newAssign = assign->new_ptr<Assign_t>();
 			newAssign->values.dup(assign->values);
 			auto i = exprs.begin();

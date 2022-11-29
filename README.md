@@ -19,6 +19,7 @@ Yuescript-P8's API is largely similar to regular Yuescript, although it features
 * `\` is no longer a chain operator, because it is used as an operator for floor division in PICO-8 Lua. Use `::` instead.
   * `\=` can now be used for update assignment.
   * The `//` operator is no longer supported, as it is replaced by `\` in PICO-8 Lua.
+* Unassigned values in a multiple-assignment expression are now allowed, which helps save tokens.
 * Implicit returns are no longer generated to help save tokens after compilation.
   * Returns must now be explicitly stated, like Lua.
   * The compiler option for implicit root returns has been removed as well.
