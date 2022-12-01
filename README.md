@@ -10,11 +10,13 @@ Yue (月) is the name of moon in Chinese and it's pronounced as [jyɛ].
 
 ## Features
 
-Yuescript-P8's API is largely similar to regular Yuescript, although it features a few key differences.
+Yuescript-P8's API is similar to regular Yuescript, although it features several key differences.
 
 * The `target` feature has been removed from the compiler, as it is tuned to PICO-8's Lua only.
 * The `^^`, `>>>`, `<<>`, and `>><` operators are now supported.
   * Their update assignment counterparts are also supported (i.e. `^^=`).
+* `0b` prefix is now supported for binary numbers.
+* Decimal exponents (`e`/`E`) and hexadecimal exponents (`p`/`P`) are no longer supported because PICO-8's Lua does not support them.
 * New `` ` ``, ``` `` ```, and ```` ``` ```` operators that compile to the memory operators `@`, `%`, and `$` respectively.
 * `\` is no longer a chain operator, because it is used as an operator for floor division in PICO-8 Lua. Use `::` instead.
   * `\=` can now be used for update assignment.
