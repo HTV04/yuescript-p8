@@ -6535,10 +6535,6 @@ private:
 			}
 		}
 		_buf << indent(1) << "__base = "sv << baseVar;
-		if (!className.empty()) {
-			_buf << ","sv << nll(classDecl);
-			_buf << indent(1) << "__name = "sv << className;
-		}
 		if (extend) {
 			_buf << ","sv << nll(classDecl);
 			_buf << indent(1) << "__parent = "sv << parentVar;

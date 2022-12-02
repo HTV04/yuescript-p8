@@ -25,6 +25,7 @@ Yuescript-P8's API is similar to regular Yuescript, although it features several
 * Implicit returns are no longer generated to help save tokens after compilation.
   * Returns must now be explicitly stated, like Lua.
   * The compiler option for implicit root returns has been removed as well.
+* `__name` fields of classes are no longer automatically created to save tokens.
 
 Additionally, the following changes have been made to Lua code generation (transparent to the API):
 
