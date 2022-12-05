@@ -26,6 +26,8 @@ Yuescript-P8's API is similar to regular Yuescript, although it features several
   * Returns must now be explicitly stated, like Lua.
   * The compiler option for implicit root returns has been removed as well.
 * `__name` fields of classes are no longer automatically created to save tokens.
+* Removed `import` functionality because it doesn't really apply to PICO-8 Lua.
+  * [Destructuring assignment](https://yuescript.org/doc/#destructuring-assignment) can be used instead of `import ... from ...`.
 
 Additionally, the following changes have been made to Lua code generation (transparent to the API):
 

@@ -204,34 +204,6 @@ YueParser::YueParser() {
 		close_attrib >> Seperator >> Space >> Variable >> *(sym(',') >> Space >> Variable)
 	) >> Assign;
 
-	colon_import_name = sym('\\') >> Space >> Variable;
-	ImportName = colon_import_name | Space >> Variable;
-	ImportNameList = Seperator >> *SpaceBreak >> ImportName >> *((+SpaceBreak | sym(',') >> *SpaceBreak) >> ImportName);
-	ImportFrom = ImportNameList >> *SpaceBreak >> Space >> key("from") >> Exp;
-
-	import_literal_inner = (range('a', 'z') | range('A', 'Z') | set("_-")) >> *(AlphaNum | '-');
-	import_literal_chain = Seperator >> import_literal_inner >> *(expr('.') >> import_literal_inner);
-	ImportLiteral = sym('\'') >> import_literal_chain >> symx('\'') | sym('"') >> import_literal_chain >> symx('"');
-
-	macro_name_pair = Space >> MacroName >> Space >> symx(':') >> Space >> MacroName;
-	import_all_macro = expr('$');
-	ImportTabItem = variable_pair | normal_pair | sym(':') >> MacroName | macro_name_pair | Space >> import_all_macro | meta_variable_pair | meta_normal_pair | Exp;
-	ImportTabList = ImportTabItem >> *(sym(',') >> ImportTabItem);
-	ImportTabLine = (
-		PushIndent >> (ImportTabList >> PopIndent | PopIndent)
-	) | Space;
-	import_tab_lines = SpaceBreak >> ImportTabLine >> *(-sym(',') >> SpaceBreak >> ImportTabLine) >> -sym(',');
-	ImportTabLit =
-		Seperator >> (sym('{') >>
-		-ImportTabList >>
-		-sym(',') >>
-		-import_tab_lines >>
-		White >> sym('}') | KeyValue >> *(sym(',') >> KeyValue));
-
-	ImportAs = ImportLiteral >> -(Space >> key("as") >> Space >> (ImportTabLit | Variable | import_all_macro));
-
-	Import = key("import") >> (ImportAs | ImportFrom);
-
 	Label = expr("::") >> LabelName >> expr("::");
 
 	Goto = key("goto") >> Space >> LabelName;
@@ -686,7 +658,7 @@ YueParser::YueParser() {
 	statement_appendix = (if_line | while_line | CompInner) >> Space;
 	statement_sep = and_(*SpaceBreak >> CheckIndent >> Space >> (set("($'\"") | expr("[[") | expr("[=")));
 	Statement = Seperator >> -(yue_comment >> *(Break >> yue_comment) >> Break >> CheckIndent) >> Space >> (
-		Import | While | Repeat | For | ForEach |
+		While | Repeat | For | ForEach |
 		Return | Local | Global | Export | Macro |
 		MacroInPlace | BreakLoop | Label | Goto | ShortTabAppending |
 		LocalAttrib | Backcall | PipeBody | ExpListAssign | ChainAssign |
